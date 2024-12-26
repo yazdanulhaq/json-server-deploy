@@ -1,18 +1,28 @@
 const jsonServer = require('json-server');
 const server = jsonServer.create();
-const router = jsonServer.router('./data.json');
+const router = jsonServer.router('./data.json'); // Path to your data.json
 const middlewares = jsonServer.defaults();
 
 server.use(middlewares);
 server.use(router);
 
-module.exports.handler = async (event, context) => {
+const handler = async (event, context) => {
   return new Promise((resolve, reject) => {
-    server.listen(3000, () => {
+    const port = 3000;
+    const app = server.listen(port, () => {
       resolve({
         statusCode: 200,
         body: JSON.stringify({ message: "JSON Server is running" }),
       });
     });
+
+    app.on('error', (error) => {
+      reject({
+        statusCode: 500,
+        body: JSON.stringify({ error: error.message }),
+      });
+    });
   });
 };
+
+module.exports = { handler };
